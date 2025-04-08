@@ -1,12 +1,17 @@
 # udemy course
+import asyncio
 import logging
 import os
-from dotenv import load_dotenv
+import threading
+import time
 import uuid
-from telegram import Update
+
+from dotenv import load_dotenv
 from telegram import KeyboardButton, ReplyKeyboardMarkup
+from telegram import Update
 from telegram.ext import ApplicationBuilder, ContextTypes, CommandHandler
 from telegram.ext import ConversationHandler, MessageHandler, filters
+
 from memory_datasource import MemoryDataSource
 
 # initial settings
@@ -18,6 +23,7 @@ ADD_REMINDER_TEXT = 'let\'s set a reminder ⏰'
 SHOW_ALL_TEXT = '🗓 show all 🗓'
 ENTER_MESSAGE, ENTER_TIME = range(2)
 data_source = MemoryDataSource()
+INTERVAL = 30
 # logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 logger = logging.getLogger()
@@ -63,6 +69,31 @@ async def enter_time_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     return ConversationHandler.END
 
 
+async def check_reminders():
+    while True:
+        print(f'{INTERVAL} seconds passed.')
+        for reminder_id in data_source.reminders:
+            reminder = data_source.reminders[reminder_id]
+            if reminder.should_be_fired():
+                reminder.fire()
+
+                await app.bot.send_message(chat_id=reminder.chat_id,
+                                           text=f"👇👇👇 it\'s time. 👇👇👇\n{reminder.message}")
+
+        time.sleep(INTERVAL)
+
+
+def wrapped_async_check_reminders():
+    asyncio.run(check_reminders())
+
+
+def start_checking_reminders():
+    print("thread started ...")
+    thread = threading.Thread(target=wrapped_async_check_reminders, args=())
+    thread.daemon = True
+    thread.start()
+
+
 def main():
     print('======= The Bot started working =======')
 
@@ -80,6 +111,9 @@ def main():
     )
 
     app.add_handler(conv_handler)
+
+    # tip : this function must be called before app.run_polling()
+    start_checking_reminders()
 
     app.run_polling()
 
