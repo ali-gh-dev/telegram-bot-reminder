@@ -15,6 +15,16 @@ FIRE_REMINDER_QUERY = """UPDATE reminders
                          SET fired = true
                          WHERE reminder_id = %s"""
 
+CREATE_TABLE_QUERY = """
+                CREATE TABLE IF NOT EXISTS reminders (
+                    reminder_id serial PRIMARY KEY,
+                    chat_id INT NOT NULL,
+                    message VARCHAR(300) NOT NULL,
+                    time TIMESTAMP NOT NULL,
+                    fired BOOLEAN NOT NULL DEFAULT FALSE
+                )
+            """
+
 
 class DataSource:
     def __init__(self, database_url):
@@ -30,15 +40,7 @@ class DataSource:
 
     def create_tables(self):
         commands = (
-            """
-                CREATE TABLE IF NOT EXISTS reminders (
-                    reminder_id serial PRIMARY KEY,
-                    chat_id INT NOT NULL,
-                    message VARCHAR(300) NOT NULL,
-                    time TIMESTAMP NOT NULL,
-                    fired BOOLEAN NOT NULL DEFAULT FALSE
-                )
-            """,
+            CREATE_TABLE_QUERY,
         )
 
         conn = None
