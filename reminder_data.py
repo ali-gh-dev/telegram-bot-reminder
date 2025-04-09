@@ -2,10 +2,10 @@ import datetime
 
 
 class Reminder:
-    def __init__(self, message, time, chat_id):
+    def __init__(self, chat_id, message, time):
+        self.chat_id = chat_id
         self.message = message
         self.time = datetime.datetime.strptime(time, "%d/%m/%Y %H:%M")
-        self.chat_id = chat_id
         self.creation_datetime = datetime.datetime.today()
         self.fired = False
 
@@ -17,7 +17,6 @@ class Reminder:
 
     def should_be_fired(self):
         return (self.fired is False) and (datetime.datetime.today() >= self.time)
-
 
 # example
 # reminder_1 = Reminder("going to work", "13/10/2025 07:30")
