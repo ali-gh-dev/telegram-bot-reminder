@@ -42,8 +42,17 @@ async def add_reminder_handler(update: Update, context: ContextTypes.DEFAULT_TYP
     if user_choice == ADD_REMINDER_TEXT:
         await update.message.reply_text("Enter message of the reminder : ")
     elif user_choice == SHOW_ALL_TEXT:
-        await update.message.reply_text("this section is under development ...")
+        all_reminders = data_source.get_all_reminders()
+        sent_messages = 0
+        await update.message.reply_text("🔻🔻🔻 all of reminders (that aren't fired yet) 🔻🔻🔻")
+        for reminder in all_reminders:
+            if not reminder.fired:
+                await update.message.reply_text(f"{reminder}")
+                sent_messages += 1
+        if sent_messages == 0:
+            await update.message.reply_text("There is nothing to show ...")
         return
+
     return ENTER_MESSAGE
 
 
@@ -58,7 +67,8 @@ async def enter_time_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     reminder_time = datetime.datetime.strptime(update.message.text, "%d/%m/%Y %H:%M")
     reminder = data_source.create_reminder(chat_id=update.message.chat_id,
                                            reminder_message=reminder_text,
-                                           reminder_time=reminder_time)
+                                           reminder_time=reminder_time,
+                                           creation_datetime=datetime.datetime.now())
     await update.message.reply_text(f"your reminder :\n===============\n{reminder}")
     return ConversationHandler.END
 
