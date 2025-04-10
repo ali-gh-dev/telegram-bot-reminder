@@ -57,14 +57,9 @@ async def enter_time_handler(update: Update, context: ContextTypes.DEFAULT_TYPE)
     reminder_text = context.user_data['reminder_text']
     reminder_time = datetime.datetime.strptime(update.message.text, "%d/%m/%Y %H:%M")
     reminder = data_source.create_reminder(chat_id=update.message.chat_id,
-                                           message=reminder_text,
-                                           time=reminder_time)
+                                           reminder_message=reminder_text,
+                                           reminder_time=reminder_time)
     await update.message.reply_text(f"your reminder :\n===============\n{reminder}")
-    # =============
-    # this part is for testing :)
-    # print('user_data : ', context.user_data)
-    # print('dict of reminders : ', data_source.reminders)
-    # =============
     return ConversationHandler.END
 
 
@@ -76,7 +71,7 @@ async def check_reminders():
                 data_source.fire_reminder(reminder.reminder_id)
 
                 await app.bot.send_message(chat_id=reminder.chat_id,
-                                           text=f"👇👇👇 it\'s time. 👇👇👇\n{reminder.message}")
+                                           text=f"👇👇👇 it\'s time. 👇👇👇\n{reminder.reminder_message}")
 
         time.sleep(INTERVAL)
 

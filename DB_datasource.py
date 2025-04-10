@@ -7,9 +7,9 @@ logger = logging.getLogger()
 
 SELECT_ALL_REMINDERS_QUERY = """SELECT * FROM reminders """
 
-INSERT_REMINDER_QUERY = """INSERT INTO reminders(chat_id, message, time)
+INSERT_REMINDER_QUERY = """INSERT INTO reminders(chat_id, reminder_message, reminder_time)
                            VALUES(%s, %s, %s)
-                           RETURNING reminder_id, chat_id, message, time, fired"""
+                           RETURNING reminder_id, chat_id, reminder_message, reminder_time, fired"""
 
 FIRE_REMINDER_QUERY = """UPDATE reminders
                          SET fired = true
@@ -18,9 +18,9 @@ FIRE_REMINDER_QUERY = """UPDATE reminders
 CREATE_TABLE_QUERY = """
                 CREATE TABLE IF NOT EXISTS reminders (
                     reminder_id serial PRIMARY KEY,
-                    chat_id INT NOT NULL,
-                    message VARCHAR(300) NOT NULL,
-                    time TIMESTAMP NOT NULL,
+                    chat_id bigint NOT NULL,
+                    reminder_message VARCHAR(300) NOT NULL,
+                    reminder_time TIMESTAMP NOT NULL,
                     fired BOOLEAN NOT NULL DEFAULT FALSE
                 )
             """
@@ -74,12 +74,12 @@ class DataSource:
             self.close_connection(conn)
             return reminders
 
-    def create_reminder(self, chat_id, message, time):
+    def create_reminder(self, chat_id, reminder_message, reminder_time):
         conn = None
         try:
             conn = self.get_connection()
             cur = conn.cursor()
-            cur.execute(INSERT_REMINDER_QUERY, (chat_id, message, time))
+            cur.execute(INSERT_REMINDER_QUERY, (chat_id, reminder_message, reminder_time))
             row = cur.fetchone()
             cur.close()
             conn.commit()
