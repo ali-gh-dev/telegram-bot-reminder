@@ -17,5 +17,5 @@ class Reminder:
         return (self.fired is False) and (datetime.datetime.today() >= self.reminder_time)
 
 
-# reminder1 = Reminder([1, 6174341890, "work 1", "2025-04-11 07:00:00", False])
-# reminder2 = Reminder([2, 6174341890, "wake up", "2024-03-25 07:00:00", True])
+# reminder1 = Reminder((1, 6174341890, "work 1", "2025-04-11 07:00:00", False, "2025-04-10 14:10:21.164"))
+# reminder2 = Reminder((2, 6174341890, "wake up", "2024-03-25 07:00:00", True, "2025-04-10 14:12:38.687"))
