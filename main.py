@@ -101,7 +101,7 @@ def main():
     print('======= The Bot started working =======')
 
     # commands
-    app.add_handler(CommandHandler('start', start_handler))
+    app.add_handler(CommandHandler("start", start_handler))
 
     # conversation
     conv_handler = ConversationHandler(
